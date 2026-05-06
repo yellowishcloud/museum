@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: musei-api
+  namespace: museum-prod
+  labels:
+    app.kubernetes.io/name: musei-api
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: musei-kasteev
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: musei-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: musei-api
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/part-of: musei-kasteev
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "4173"
+        prometheus.io/path: "/api/healthz"
+    spec:
+      serviceAccountName: musei-api
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: fetch-source
+          image: alpine/git:2.47.2
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              git clone --depth=1 --branch=main https://github.com/yellowishcloud/museum.git /workspace/src
+              cp -R /workspace/src/. /app
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: app-source
+              mountPath: /app
+            - name: git-workspace
+              mountPath: /workspace
+      containers:
+        - name: api
+          image: node:24-alpine
+          imagePullPolicy: IfNotPresent
+          workingDir: /app
+          command: ["node", "--no-warnings", "server.js"]
+          env:
+            - name: PORT
+              value: "4173"
+            - name: MUSEI_DB_FILE
+              value: /data/musei-kasteev.sqlite
+            - name: MUSEI_DEMO_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: musei-demo-admin
+                  key: password
+                  optional: true
+          ports:
+            - name: http
+              containerPort: 4173
+          readinessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+            initialDelaySeconds: 8
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: app-source
+              mountPath: /app
+            - name: sqlite-data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: app-source
+          emptyDir: {}
+        - name: git-workspace
+          emptyDir: {}
+        - name: sqlite-data
+          persistentVolumeClaim:
+            claimName: musei-sqlite-data
+        - name: tmp
+          emptyDir: {}

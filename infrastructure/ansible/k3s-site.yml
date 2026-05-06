@@ -1,0 +1,25 @@
+- name: Prepare self-hosted K3s nodes
+  hosts: k3s
+  become: true
+  tasks:
+    - name: Install base packages
+      ansible.builtin.apt:
+        name:
+          - curl
+          - open-iscsi
+          - nfs-common
+          - jq
+        update_cache: true
+        state: present
+
+    - name: Enable iscsid for Longhorn
+      ansible.builtin.systemd:
+        name: iscsid
+        enabled: true
+        state: started
+
+    - name: Install K3s server
+      ansible.builtin.shell: |
+        curl -sfL https://get.k3s.io | sh -s - server --write-kubeconfig-mode 644
+      args:
+        creates: /usr/local/bin/k3s

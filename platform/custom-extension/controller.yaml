@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: museum-backup-policy-controller
+  namespace: museum-system
+  labels:
+    app.kubernetes.io/name: museum-backup-policy-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: museum-backup-policy-controller
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: museum-backup-policy-controller
+    spec:
+      serviceAccountName: museum-backup-policy-controller
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: controller
+          image: lachlanevenson/k8s-kubectl:v1.25.4
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              while true; do
+                kubectl get museumbackuppolicies.devops.aknie.kz -A -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{.metadata.name}{" "}{.spec.pvcName}{" "}{.spec.schedule}{" "}{.spec.retention}{"\n"}{end}' |
+                while read -r ns name pvc schedule retention; do
+                  [ -z "${ns:-}" ] && continue
+                  kubectl -n "$ns" create configmap "backup-policy-${name}" \
+                    --from-literal=pvcName="$pvc" \
+                    --from-literal=schedule="$schedule" \
+                    --from-literal=retention="$retention" \
+                    --from-literal=managedBy="museum-backup-policy-controller" \
+                    --dry-run=client -o yaml | kubectl apply -f -
+                done
+                sleep 20
+              done
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

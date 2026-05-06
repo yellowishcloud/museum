@@ -1,0 +1,47 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: museumbackuppolicies.devops.aknie.kz
+spec:
+  group: devops.aknie.kz
+  scope: Namespaced
+  names:
+    plural: museumbackuppolicies
+    singular: museumbackuppolicy
+    kind: MuseumBackupPolicy
+    shortNames:
+      - mbp
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required: ["spec"]
+          properties:
+            spec:
+              type: object
+              required: ["pvcName", "schedule", "retention"]
+              properties:
+                pvcName:
+                  type: string
+                schedule:
+                  type: string
+                retention:
+                  type: string
+                snapshotClass:
+                  type: string
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+      additionalPrinterColumns:
+        - name: PVC
+          type: string
+          jsonPath: .spec.pvcName
+        - name: Schedule
+          type: string
+          jsonPath: .spec.schedule
+        - name: Retention
+          type: string
+          jsonPath: .spec.retention

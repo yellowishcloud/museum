@@ -1,0 +1,21 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: musei-web
+  namespace: museum-prod
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: musei-web
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: musei-api
+  namespace: museum-prod
+spec:
+  maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: musei-api

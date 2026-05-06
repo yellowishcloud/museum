@@ -1,0 +1,13 @@
+apiVersion: devops.aknie.kz/v1alpha1
+kind: MuseumBackupPolicy
+metadata:
+  name: sqlite-daily
+  namespace: museum-prod
+  labels:
+    app.kubernetes.io/name: musei-api
+    app.kubernetes.io/component: backup-policy
+spec:
+  pvcName: musei-sqlite-data
+  schedule: daily-02:00
+  retention: 7d
+  snapshotClass: hostpath-demo

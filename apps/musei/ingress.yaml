@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: musei-web
+  namespace: museum-prod
+  labels:
+    app.kubernetes.io/name: musei-web
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "2m"
+spec:
+  ingressClassName: public
+  rules:
+    - host: museum.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: musei-web
+                port:
+                  number: 80

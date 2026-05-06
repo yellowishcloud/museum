@@ -1,0 +1,83 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  labels:
+    app.kubernetes.io/part-of: final-project
+spec:
+  project: final-project
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 84.5.0
+    helm:
+      values: |
+        fullnameOverride: monitoring
+        grafana:
+          enabled: true
+          admin:
+            existingSecret: grafana-admin
+            userKey: admin-user
+            passwordKey: admin-password
+          initChownData:
+            enabled: false
+          service:
+            type: ClusterIP
+          persistence:
+            enabled: true
+            size: 1Gi
+            storageClassName: microk8s-hostpath
+          sidecar:
+            dashboards:
+              enabled: false
+            datasources:
+              enabled: false
+          additionalDataSources:
+            - name: Prometheus
+              type: prometheus
+              url: http://monitoring-prometheus.monitoring.svc.cluster.local:9090
+              access: proxy
+              isDefault: true
+              editable: true
+        prometheus:
+          prometheusSpec:
+            retention: 3d
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: microk8s-hostpath
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 3Gi
+        alertmanager:
+          alertmanagerSpec:
+            storage:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: microk8s-hostpath
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 1Gi
+        nodeExporter:
+          enabled: false
+        kubeEtcd:
+          enabled: false
+        kubeControllerManager:
+          enabled: false
+        kubeScheduler:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

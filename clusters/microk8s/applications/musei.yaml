@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: musei-kasteev
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  labels:
+    app.kubernetes.io/part-of: final-project
+spec:
+  project: final-project
+  source:
+    repoURL: https://github.com/yellowishcloud/museum.git
+    targetRevision: main
+    path: apps/musei
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: museum-prod
+  ignoreDifferences:
+    - group: argoproj.io
+      kind: Rollout
+      name: musei-web
+      namespace: museum-prod
+      jsonPointers:
+        - /spec
+        - /metadata/annotations/rollout.argoproj.io~1revision
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

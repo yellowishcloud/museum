@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: final-project
+  namespace: argocd
+spec:
+  description: DevOps II final project GitOps project
+  sourceRepos:
+    - https://github.com/yellowishcloud/museum.git
+    - https://argoproj.github.io/argo-helm
+    - https://prometheus-community.github.io/helm-charts
+  destinations:
+    - namespace: museum-prod
+      server: https://kubernetes.default.svc
+    - namespace: argo-rollouts
+      server: https://kubernetes.default.svc
+    - namespace: monitoring
+      server: https://kubernetes.default.svc
+    - namespace: museum-system
+      server: https://kubernetes.default.svc
+    - namespace: kube-system
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  roles:
+    - name: readonly-review
+      description: Read-only project access for project review
+      policies:
+        - p, proj:final-project:readonly-review, applications, get, final-project/*, allow

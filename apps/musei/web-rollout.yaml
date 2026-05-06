@@ -1,0 +1,134 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: musei-web
+  namespace: museum-prod
+  labels:
+    app.kubernetes.io/name: musei-web
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: musei-kasteev
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: musei-web
+  strategy:
+    canary:
+      maxSurge: 1
+      maxUnavailable: 0
+      steps:
+        - setWeight: 25
+        - pause:
+            duration: 20s
+        - setWeight: 50
+        - pause:
+            duration: 20s
+        - setWeight: 100
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: musei-web
+        app.kubernetes.io/component: frontend
+        app.kubernetes.io/part-of: musei-kasteev
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+    spec:
+      serviceAccountName: musei-web
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: fetch-static
+          image: alpine/git:2.47.2
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              git clone --depth=1 --branch=main https://github.com/yellowishcloud/museum.git /workspace/src
+              cp /workspace/src/index.html /usr/share/nginx/html/
+              cp /workspace/src/script.js /usr/share/nginx/html/
+              cp /workspace/src/styles.css /usr/share/nginx/html/
+              cp -R /workspace/src/assets /usr/share/nginx/html/assets
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+            - name: git-workspace
+              mountPath: /workspace
+      containers:
+        - name: web
+          image: nginxinc/nginx-unprivileged:1.27-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+              readOnly: true
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: html
+          emptyDir: {}
+        - name: git-workspace
+          emptyDir: {}
+        - name: nginx-config
+          configMap:
+            name: musei-nginx-config
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}

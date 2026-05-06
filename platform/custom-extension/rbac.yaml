@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: museum-backup-policy-controller
+  namespace: museum-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: museum-backup-policy-controller
+rules:
+  - apiGroups: ["devops.aknie.kz"]
+    resources: ["museumbackuppolicies"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: museum-backup-policy-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: museum-backup-policy-controller
+subjects:
+  - kind: ServiceAccount
+    name: museum-backup-policy-controller
+    namespace: museum-system

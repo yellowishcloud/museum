@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: museum-custom-extension
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    app.kubernetes.io/part-of: final-project
+spec:
+  project: final-project
+  source:
+    repoURL: https://github.com/yellowishcloud/museum.git
+    targetRevision: main
+    path: platform/custom-extension
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: museum-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

@@ -1,0 +1,9 @@
+{
+  "name": "musei-kasteev-information-system",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "powershell -NoProfile -ExecutionPolicy Bypass -File ./start.ps1",
+    "server": "node --no-warnings server.js"
+  }
+}

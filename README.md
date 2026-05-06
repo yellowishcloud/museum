@@ -27,27 +27,4 @@ In this version, the controller watches `MuseumBackupPolicy` resources and recon
 
 Local databases, kubeconfigs, Terraform state, private variables, keys, certificates, logs, and presentation materials are intentionally ignored. The SQLite file is local runtime data and should not be committed.
 
-Demo account passwords are not committed. For a fresh local demo database, set `MUSEI_DEMO_VISITOR_PASSWORD` and/or `MUSEI_DEMO_ADMIN_PASSWORD` before first startup if seed accounts should be created. The application stores only salted password hashes in SQLite.
-
-For a fresh Kubernetes demo, create the optional admin seed secret before the first API pod starts:
-
-```bash
-kubectl create namespace museum-prod --dry-run=client -o yaml | kubectl apply -f -
-kubectl -n museum-prod create secret generic musei-demo-admin --from-literal=password='<local-demo-password>'
-```
-
-## Useful Commands
-
-```bash
-kubectl kustomize apps/musei
-kubectl kustomize platform/custom-extension
-kubectl kustomize clusters/microk8s
-```
-
-```bash
-bash bootstrap/microk8s-prereqs.sh
-bash bootstrap/install-argocd.sh
-bash bootstrap/port-forwards.sh
-```
-
-Grafana credentials are stored in the `grafana-admin` Kubernetes Secret created by `bootstrap/install-argocd.sh`.
+Demo account passwords are not committed. The application stores only salted password hashes in SQLite.

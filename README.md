@@ -17,7 +17,7 @@ Musei Kasteev is a digital museum prototype deployed on a Kubernetes cluster wit
 ## Live Verification Commands
 
 ```bash
-kubectl get applications -n argocd
+kubectl get applications -n argocd -o wide
 kubectl get nodes -o wide
 kubectl get rollout,deploy,svc,ingress,pvc,hpa,networkpolicy,pdb -n museum-prod
 kubectl top pods -n museum-prod
@@ -25,6 +25,12 @@ kubectl get pods -n monitoring
 kubectl get pods -n logging
 kubectl get museumbackuppolicies -n museum-prod
 kubectl get configmap -n museum-prod backup-policy-postgresql-daily -o yaml
+```
+
+GitOps source of truth:
+
+```text
+https://github.com/yellowishcloud/museum.git
 ```
 
 Local dashboard/app access:

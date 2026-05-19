@@ -11,7 +11,7 @@ For security, the workloads run as non-root, drop Linux capabilities, use Resour
 ## Best Live Demo Order
 
 1. `kubectl get nodes -o wide` — show the cluster topology.
-2. `kubectl get applications -n argocd` — show GitOps apps all Synced/Healthy.
+2. `kubectl get applications -n argocd -o wide` — show GitOps apps all Synced/Healthy and reconciled from GitHub.
 3. `kubectl get rollout,deploy,svc,ingress,pvc,hpa -n museum-prod` — show business architecture.
 4. `kubectl get pods -n monitoring` and `kubectl get pods -n logging` — show metrics and logs.
 5. `kubectl get networkpolicy,resourcequota,limitrange,pdb -n museum-prod` — show security and governance.
@@ -24,6 +24,10 @@ For security, the workloads run as non-root, drop Linux capabilities, use Resour
 ### Do we meet Perfection?
 
 Yes. The live cluster has defined release strategies, working autoscaling, a CRD/controller, monitoring, logging, secure workload controls, persistent PostgreSQL storage, and a complete business application.
+
+### What is the GitOps source of truth?
+
+The source of truth is `https://github.com/yellowishcloud/museum.git`. Argo CD tracks the `main` branch and reconciles both the business app and the custom extension from Git. Manual cluster drift is visible in Argo CD, so the defense can show that the cluster is not just “installed manually”; it is managed declaratively.
 
 ### Why PostgreSQL instead of SQLite?
 

@@ -16,21 +16,6 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: museum-prod
-  ignoreDifferences:
-    - group: argoproj.io
-      kind: Rollout
-      name: musei-web
-      namespace: museum-prod
-      jsonPointers:
-        - /spec
-        - /metadata/annotations/rollout.argoproj.io~1revision
-    - group: argoproj.io
-      kind: Rollout
-      name: musei-api
-      namespace: museum-prod
-      jsonPointers:
-        - /spec
-        - /metadata/annotations/rollout.argoproj.io~1revision
   syncPolicy:
     automated:
       prune: true

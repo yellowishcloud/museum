@@ -10,7 +10,7 @@ metadata:
 spec:
   project: final-project
   source:
-    repoURL: git://museum-git.gitops.svc.cluster.local/museum.git
+    repoURL: http://museum-git.gitops.svc.cluster.local:8000/museum.git
     targetRevision: main
     path: apps/musei
   destination:
@@ -38,4 +38,5 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+
 

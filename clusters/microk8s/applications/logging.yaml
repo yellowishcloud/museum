@@ -22,6 +22,9 @@ spec:
             size: 2Gi
         promtail:
           enabled: true
+          readinessProbe:
+            timeoutSeconds: 5
+            failureThreshold: 10
         grafana:
           enabled: false
         fluent-bit:

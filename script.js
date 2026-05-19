@@ -529,8 +529,7 @@ function renderUserRegistry() {
           <th>email</th>
           <th>role</th>
           <th>name</th>
-          <th>password_salt</th>
-          <th>password_hash</th>
+          <th>password hash stored</th>
           <th>created_at</th>
         </tr>
       </thead>
@@ -543,8 +542,7 @@ function renderUserRegistry() {
                 <td>${escapeHtml(user.email)}</td>
                 <td><span class="role-pill ${escapeHtml(user.role)}">${escapeHtml(user.role)}</span></td>
                 <td>${escapeHtml(user.name)}</td>
-                <td class="hash-cell">${escapeHtml(user.password_salt)}</td>
-                <td class="hash-cell">${escapeHtml(user.password_hash)}</td>
+                <td>${user.password_hash_stored ? "yes" : "no"}</td>
                 <td>${escapeHtml(user.created_at)}</td>
               </tr>
             `

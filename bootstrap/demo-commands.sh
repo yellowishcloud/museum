@@ -16,7 +16,7 @@ kubectl get networkpolicy deny-all -n museum-prod -o yaml
 echo "Custom CRD proof"
 kubectl get crd museumbackuppolicies.devops.aknie.kz
 kubectl get museumbackuppolicies -n museum-prod
-kubectl get configmap -n museum-prod backup-policy-sqlite-daily -o yaml
+kubectl get configmap -n museum-prod backup-policy-postgresql-daily -o yaml
 
 echo "Monitoring proof"
 kubectl get pods,svc,pvc -n monitoring

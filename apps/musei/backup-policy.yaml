@@ -10,4 +10,3 @@ spec:
   pvcName: musei-postgresql-data
   schedule: daily-02:00
   retention: 7d
-  snapshotClass: do-block-storage

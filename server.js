@@ -64,10 +64,27 @@ async function createSession(userId) { const token = crypto.randomBytes(32).toSt
 function n(value, fallback = 3) { const number = Number(value); return Number.isFinite(number) ? Math.min(5, Math.max(1, Math.round(number))) : fallback; }
 function classify(input) { const digitalUse=n(input.digitalUse), usefulness=n(input.usefulness), accessibility=n(input.accessibility), virtualTours=n(input.virtualTours), images3d=n(input.images3d), interactive=n(input.interactive), futureIntention=n(input.futureIntention); const readiness=(digitalUse+usefulness+accessibility+virtualTours+images3d+interactive)/6; const predicted=readiness>=3.7?"Positive":"Negative", actual=futureIntention>=4?"Positive":"Negative"; const result=predicted==="Positive"&&actual==="Positive"?"TP":predicted==="Positive"?"FP":actual==="Positive"?"FN":"TN"; return {digitalUse,usefulness,accessibility,virtualTours,images3d,interactive,futureIntention,readiness,predicted,actual,result}; }
 function answer(question) { const s=String(question||"").toLowerCase(); if (s.includes("database")||s.includes("postgres")||s.includes("password")) return "The production database is PostgreSQL. Passwords are stored only as salt plus PBKDF2 hash; plaintext passwords are never stored."; if (s.includes("tour")||s.includes("vr")||s.includes("360")) return "Musei links to official/public VR sources instead of copying 360 assets, then adds authentication, favorites, CMS, profile, survey, and database functions around them."; if (s.includes("role")||s.includes("admin")) return "Visitors use the museum functions; admins can additionally view database proof and manage artifact CMS records."; return "Musei Kasteev is a Kubernetes-deployed digital museum information system with PostgreSQL persistence, VR sources, collection, favorites, profile CRUD, admin CMS CRUD, survey classification, and a 3D model demo."; }
-function json(res, status, payload) { res.writeHead(status, { "Content-Type":"application/json; charset=utf-8" }); res.end(JSON.stringify(payload)); }
+const securityHeaders = {
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "no-referrer",
+  "Content-Security-Policy": "default-src 'self'; img-src 'self' https: data:; frame-src https://sketchfab.com; connect-src 'self'; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'self'"
+};
+function json(res, status, payload) { res.writeHead(status, { ...securityHeaders, "Content-Type":"application/json; charset=utf-8" }); res.end(JSON.stringify(payload)); }
 function notFound(res) { json(res, 404, { error: "Not found" }); }
 function body(req) { return new Promise((resolve,reject)=>{ let b=""; req.on("data", c=>{ b+=c; if (b.length>1_000_000) { reject(new Error("Request body is too large")); req.destroy(); }}); req.on("end",()=>{ try { resolve(b?JSON.parse(b):{}); } catch(e){ reject(e); }}); req.on("error",reject); }); }
-async function snapshot() { return { users:(await q("SELECT id,email,role,password_salt,password_hash,name,interest,language,created_at,updated_at FROM users ORDER BY id DESC")).rows, profiles:(await q("SELECT * FROM profiles ORDER BY id DESC")).rows, artifacts:(await q("SELECT * FROM artifacts ORDER BY id DESC")).rows, virtual_tours:(await q("SELECT * FROM virtual_tours ORDER BY id DESC")).rows, favorites:(await q("SELECT * FROM favorites ORDER BY id DESC")).rows, survey_responses:(await q("SELECT * FROM survey_responses ORDER BY id DESC")).rows, assistant_messages:(await q("SELECT * FROM assistant_messages ORDER BY id DESC")).rows, sessions:(await q("SELECT id,user_id,substring(token from 1 for 12)||'...' AS token_preview,created_at FROM sessions ORDER BY id DESC")).rows }; }
+async function snapshot() {
+  return {
+    users: (await q("SELECT id,email,role,name,interest,language,(password_hash IS NOT NULL) AS password_hash_stored,created_at,updated_at FROM users ORDER BY id DESC")).rows,
+    profiles: (await q("SELECT * FROM profiles ORDER BY id DESC")).rows,
+    artifacts: (await q("SELECT * FROM artifacts ORDER BY id DESC")).rows,
+    virtual_tours: (await q("SELECT * FROM virtual_tours ORDER BY id DESC")).rows,
+    favorites: (await q("SELECT * FROM favorites ORDER BY id DESC")).rows,
+    survey_responses: (await q("SELECT * FROM survey_responses ORDER BY id DESC")).rows,
+    assistant_messages: (await q("SELECT * FROM assistant_messages ORDER BY id DESC")).rows,
+    sessions: (await q("SELECT id,user_id,created_at FROM sessions ORDER BY id DESC")).rows
+  };
+}
 
 async function api(req,res,pathname) {
   try {
@@ -89,5 +106,5 @@ async function api(req,res,pathname) {
     notFound(res);
   } catch (e) { if(e.code==="23505") return json(res,409,{error:"This email is already registered"}); console.error(e); json(res,500,{error:e.message||"Server error"}); }
 }
-function serve(req,res,pathname) { const safe=pathname==="/"?"/index.html":pathname, file=path.normalize(path.join(ROOT,safe)); if(!file.startsWith(ROOT)) return notFound(res); fs.readFile(file,(err,data)=>{ if(err) return notFound(res); const ext=path.extname(file).toLowerCase(); const type={".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".jpg":"image/jpeg",".jpeg":"image/jpeg",".png":"image/png",".svg":"image/svg+xml"}[ext]||"application/octet-stream"; res.writeHead(200,{"Content-Type":type,"Cache-Control":[".html",".css",".js"].includes(ext)?"no-store":"public, max-age=3600"}); res.end(data); }); }
+function serve(req,res,pathname) { const safe=pathname==="/"?"/index.html":pathname, file=path.normalize(path.join(ROOT,safe)); if(!file.startsWith(ROOT)) return notFound(res); fs.readFile(file,(err,data)=>{ if(err) return notFound(res); const ext=path.extname(file).toLowerCase(); const type={".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".jpg":"image/jpeg",".jpeg":"image/jpeg",".png":"image/png",".svg":"image/svg+xml"}[ext]||"application/octet-stream"; res.writeHead(200,{...securityHeaders,"Content-Type":type,"Cache-Control":[".html",".css",".js"].includes(ext)?"no-store":"public, max-age=3600"}); res.end(data); }); }
 initDb().then(()=>http.createServer((req,res)=>{ const url=new URL(req.url,`http://${req.headers.host}`); if(url.pathname.startsWith("/api/")) return void api(req,res,url.pathname); serve(req,res,decodeURIComponent(url.pathname)); }).listen(PORT,"0.0.0.0",()=>console.log(`Musei Kasteev running on ${PORT} with PostgreSQL`))).catch(e=>{ console.error("Startup failed",e); process.exit(1); });

@@ -16,7 +16,7 @@ const categories = ["all", "Painting", "Sculpture", "Graphics", "Applied art"];
 
 const translations = {
   en: {
-    brandSubtitle: "SQLite digital museum IS",
+    brandSubtitle: "PostgreSQL digital museum IS",
     navTour: "Tour",
     navVr: "VR sources",
     navCollection: "Collection",
@@ -30,17 +30,17 @@ const translations = {
     profile: "Profile",
     admin: "Admin",
     welcomeTitle: "Enter the digital museum",
-    welcomeBody: "Sign in first, then the system will open the tour, collection, project guide, survey classifier, CRUD forms, and SQLite database viewer.",
+    welcomeBody: "Sign in first, then the system will open the tour, collection, project guide, survey classifier, CRUD forms, and PostgreSQL database viewer.",
     backendNote: "Database features require the Node server. Use <strong>node server.js</strong>, not <strong>python -m http.server</strong>.",
     heroEyebrow: "A. Kasteev Museum pilot",
     heroTitle: "Digital museum system with real database flow",
-    heroBody: "A working project prototype with authentication, profile CRUD, artifact CMS, survey classification, project guide, favorites, and an admin SQLite database.",
+    heroBody: "A working project prototype with authentication, profile CRUD, artifact CMS, survey classification, project guide, favorites, and an admin PostgreSQL database.",
     startTour: "Start tour",
     vrSources: "VR sources",
     vrEyebrow: "Official and public VR sources",
     vrTitle: "360 tours connected to the information system",
     reloadTours: "Reload tours",
-    vrNote: "These viewers stay on their own websites. Musei stores their source records in SQLite and connects them to the local system features.",
+    vrNote: "These viewers stay on their own websites. Musei stores their source records in PostgreSQL and connects them to the local system features.",
     searchCollection: "Search collection",
     searchPlaceholder: "Try Itkind, painting, sculpture...",
     profileStatsGuest: "Sign in to save favorites and survey results.",
@@ -77,7 +77,7 @@ const translations = {
     profileCrud: "User profile CRUD",
     artifactCrud: "Artifact CMS CRUD",
     databaseEyebrow: "Admin database proof",
-    databaseTitle: "SQLite tables visible in the GUI",
+    databaseTitle: "PostgreSQL tables visible in the GUI",
     reloadDatabase: "Reload database",
     coverageEyebrow: "Project requirement coverage",
     coverageTitle: "Implemented functions",
@@ -101,7 +101,7 @@ const translations = {
     welcomeMessage: "Welcome. Visitor accounts can use the museum features and CRUD forms. Admin can open Database to show roles, password storage status, virtual tour records, favorites, survey responses, and guide messages.",
   },
   ru: {
-    brandSubtitle: "Цифровая музейная ИС на SQLite",
+    brandSubtitle: "Цифровая музейная ИС на PostgreSQL",
     navTour: "Тур",
     navVr: "VR-источники",
     navCollection: "Коллекция",
@@ -115,17 +115,17 @@ const translations = {
     profile: "Профиль",
     admin: "Админ",
     welcomeTitle: "Войти в цифровой музей",
-    welcomeBody: "Сначала войдите в систему, затем откроются тур, коллекция, проектный гид, классификатор опроса, CRUD-формы и просмотр SQLite.",
+    welcomeBody: "Сначала войдите в систему, затем откроются тур, коллекция, проектный гид, классификатор опроса, CRUD-формы и просмотр PostgreSQL.",
     backendNote: "Для базы данных нужен Node-сервер. Используйте <strong>node server.js</strong>, а не <strong>python -m http.server</strong>.",
     heroEyebrow: "Пилот музея им. А. Кастеева",
     heroTitle: "Цифровой музей с настоящей базой данных",
-    heroBody: "Рабочий прототип с авторизацией, CRUD профиля, CMS экспонатов, классификацией опроса, проектным гидом, избранным и админской SQLite-базой.",
+    heroBody: "Рабочий прототип с авторизацией, CRUD профиля, CMS экспонатов, классификацией опроса, проектным гидом, избранным и админской PostgreSQL-базой.",
     startTour: "Открыть тур",
     vrSources: "VR-источники",
     vrEyebrow: "Официальные и публичные VR-источники",
     vrTitle: "360-туры, подключенные к информационной системе",
     reloadTours: "Обновить туры",
-    vrNote: "Эти просмотровщики остаются на своих сайтах. Musei хранит ссылки в SQLite и связывает их с локальными функциями системы.",
+    vrNote: "Эти просмотровщики остаются на своих сайтах. Musei хранит ссылки в PostgreSQL и связывает их с локальными функциями системы.",
     searchCollection: "Поиск по коллекции",
     searchPlaceholder: "Например: Itkind, живопись, скульптура...",
     profileStatsGuest: "Войдите, чтобы сохранять избранное и результаты опроса.",
@@ -162,7 +162,7 @@ const translations = {
     profileCrud: "CRUD профиля пользователя",
     artifactCrud: "CRUD CMS экспонатов",
     databaseEyebrow: "Доказательство БД для админа",
-    databaseTitle: "Таблицы SQLite видны в интерфейсе",
+    databaseTitle: "Таблицы PostgreSQL видны в интерфейсе",
     reloadDatabase: "Обновить базу",
     coverageEyebrow: "Покрытие требований проекта",
     coverageTitle: "Реализованные функции",
@@ -186,7 +186,7 @@ const translations = {
     welcomeMessage: "Добро пожаловать. Посетитель использует функции музея и CRUD-формы. Админ открывает базу данных, чтобы показать роли, хэши паролей, VR-записи, избранное, опросы и сообщения гида.",
   },
   kk: {
-    brandSubtitle: "SQLite негізіндегі цифрлық музей АЖ",
+    brandSubtitle: "PostgreSQL негізіндегі цифрлық музей АЖ",
     navTour: "Тур",
     navVr: "VR көздері",
     navCollection: "Коллекция",
@@ -200,17 +200,17 @@ const translations = {
     profile: "Профиль",
     admin: "Админ",
     welcomeTitle: "Цифрлық музейге кіріңіз",
-    welcomeBody: "Алдымен жүйеге кіріңіз, содан кейін тур, коллекция, жоба гиді, сауалнама классификаторы, CRUD формалары және SQLite көрінісі ашылады.",
+    welcomeBody: "Алдымен жүйеге кіріңіз, содан кейін тур, коллекция, жоба гиді, сауалнама классификаторы, CRUD формалары және PostgreSQL көрінісі ашылады.",
     backendNote: "Дерекқор функциялары үшін Node сервері керек. <strong>node server.js</strong> қолданыңыз, <strong>python -m http.server</strong> емес.",
     heroEyebrow: "А. Қастеев музейінің пилоты",
     heroTitle: "Нақты дерекқоры бар цифрлық музей",
-    heroBody: "Авторизация, профиль CRUD, экспонат CMS, сауалнама классификациясы, жоба гиді, таңдаулылар және админге арналған SQLite дерекқоры бар жұмыс прототипі.",
+    heroBody: "Авторизация, профиль CRUD, экспонат CMS, сауалнама классификациясы, жоба гиді, таңдаулылар және админге арналған PostgreSQL дерекқоры бар жұмыс прототипі.",
     startTour: "Турды ашу",
     vrSources: "VR көздері",
     vrEyebrow: "Ресми және ашық VR көздері",
     vrTitle: "Ақпараттық жүйеге қосылған 360 турлар",
     reloadTours: "Турларды жаңарту",
-    vrNote: "Бұл қарау жүйелері өз сайттарында қалады. Musei олардың сілтемелерін SQLite ішінде сақтап, жергілікті жүйе функцияларымен байланыстырады.",
+    vrNote: "Бұл қарау жүйелері өз сайттарында қалады. Musei олардың сілтемелерін PostgreSQL ішінде сақтап, жергілікті жүйе функцияларымен байланыстырады.",
     searchCollection: "Коллекциядан іздеу",
     searchPlaceholder: "Мысалы: Itkind, кескіндеме, мүсін...",
     profileStatsGuest: "Таңдаулылар мен сауалнама нәтижелерін сақтау үшін кіріңіз.",
@@ -247,7 +247,7 @@ const translations = {
     profileCrud: "Пайдаланушы профилі CRUD",
     artifactCrud: "Экспонат CMS CRUD",
     databaseEyebrow: "Админге арналған ДҚ дәлелі",
-    databaseTitle: "SQLite кестелері интерфейсте көрінеді",
+    databaseTitle: "PostgreSQL кестелері интерфейсте көрінеді",
     reloadDatabase: "Дерекқорды жаңарту",
     coverageEyebrow: "Жоба талаптарының қамтылуы",
     coverageTitle: "Іске асырылған функциялар",
@@ -705,7 +705,7 @@ document.addEventListener("click", async (event) => {
   if (deleteButton) {
     if (!isAdmin()) return;
     const artifactId = Number(deleteButton.dataset.deleteArtifact);
-    if (window.confirm("Delete this artifact from the SQLite database?")) {
+    if (window.confirm("Delete this artifact from the PostgreSQL database?")) {
       await api(`/api/artifacts/${artifactId}`, { method: "DELETE" });
       await refreshAll();
     }
@@ -795,7 +795,7 @@ $("#profileForm").addEventListener("submit", async (event) => {
 
 $("#deleteAccountButton").addEventListener("click", async () => {
   if (!state.user) return;
-  if (window.confirm("Delete the current user, profile, favorites, survey rows, and session from SQLite?")) {
+  if (window.confirm("Delete the current user, profile, favorites, survey rows, and session from PostgreSQL?")) {
     await api("/api/account", { method: "DELETE" });
     localStorage.removeItem("museiToken");
     state.token = null;

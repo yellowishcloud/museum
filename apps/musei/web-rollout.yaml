@@ -52,7 +52,7 @@ spec:
           args:
             - |
               set -eu
-              git clone --depth=1 --branch=main git://museum-git.gitops.svc.cluster.local/museum.git /workspace/src
+              git clone --depth=1 --branch=main https://github.com/yellowishcloud/museum.git /workspace/src
               cp /workspace/src/index.html /usr/share/nginx/html/
               cp /workspace/src/script.js /usr/share/nginx/html/
               cp /workspace/src/styles.css /usr/share/nginx/html/
@@ -132,6 +132,3 @@ spec:
           emptyDir: {}
         - name: tmp
           emptyDir: {}
-
-
-

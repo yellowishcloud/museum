@@ -10,7 +10,7 @@ metadata:
 spec:
   project: final-project
   source:
-    repoURL: git://museum-git.gitops.svc.cluster.local/museum.git
+    repoURL: https://github.com/yellowishcloud/museum.git
     targetRevision: main
     path: apps/musei
   destination:

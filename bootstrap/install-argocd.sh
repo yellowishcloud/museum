@@ -35,15 +35,6 @@ Open dashboards for the live demo:
   kubectl port-forward svc/monitoring-grafana -n monitoring 3000:80
   kubectl port-forward svc/argo-rollouts-dashboard -n argo-rollouts 3100:3100
 
-Passwords:
-
-  Argo CD admin:
-    kubectl -n argocd get secret argocd-initial-admin-secret \
-      -o jsonpath='{.data.password}' | base64 -d; echo
-
-  Grafana:
-    kubectl -n monitoring get secret grafana-admin \
-      -o jsonpath='{.data.admin-user}' | base64 -d; echo
-    kubectl -n monitoring get secret grafana-admin \
-      -o jsonpath='{.data.admin-password}' | base64 -d; echo
+Dashboard credentials are stored in Kubernetes Secrets. Read them only from
+your private cluster context during the defense.
 NOTE

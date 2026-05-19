@@ -13,9 +13,8 @@ Dashboards:
   Argo Rollouts:   http://127.0.0.1:3100
   Museum app:       http://127.0.0.1:8088
 
-Grafana credentials are stored in the cluster secret:
-  kubectl -n monitoring get secret grafana-admin -o jsonpath='{.data.admin-user}' | base64 -d; echo
-  kubectl -n monitoring get secret grafana-admin -o jsonpath='{.data.admin-password}' | base64 -d; echo
+Dashboard credentials are stored in Kubernetes Secrets. Read them only from
+your private cluster context during the defense.
 
 Press Ctrl+C to stop port-forwards.
 NOTE

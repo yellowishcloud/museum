@@ -98,7 +98,7 @@ const translations = {
     delete: "Delete",
     unknown: "Unknown",
     modelContext: "The embedded monument model demonstrates the 3D-viewer function for Musei. The selected collection item is <strong>{title}</strong>; in production, Kasteev-approved scans could be connected to each artifact record. <a href=\"https://sketchfab.com/3d-models/40e6e181ac1c41c980512a3c9610cf97\" target=\"_blank\" rel=\"noreferrer\">Open source page</a>.",
-    welcomeMessage: "Welcome. Visitor accounts can use the museum features and CRUD forms. Admin can open Database to show roles, password hashes, virtual tour records, favorites, survey responses, and guide messages.",
+    welcomeMessage: "Welcome. Visitor accounts can use the museum features and CRUD forms. Admin can open Database to show roles, password storage status, virtual tour records, favorites, survey responses, and guide messages.",
   },
   ru: {
     brandSubtitle: "Цифровая музейная ИС на SQLite",

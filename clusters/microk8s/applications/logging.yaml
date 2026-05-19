@@ -22,6 +22,9 @@ spec:
             size: 2Gi
         promtail:
           enabled: true
+          config:
+            clients:
+              - url: http://logging-loki:3100/loki/api/v1/push
           readinessProbe:
             timeoutSeconds: 5
             failureThreshold: 10

@@ -25,9 +25,7 @@ spec:
           config:
             clients:
               - url: http://logging-loki:3100/loki/api/v1/push
-          readinessProbe:
-            timeoutSeconds: 5
-            failureThreshold: 10
+          readinessProbe: null
         grafana:
           enabled: false
         fluent-bit:

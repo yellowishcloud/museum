@@ -1,5 +1,5 @@
-apiVersion: apps/v1
-kind: Deployment
+﻿apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: musei-api
   namespace: museum-prod
@@ -8,16 +8,20 @@ metadata:
     app.kubernetes.io/component: backend
     app.kubernetes.io/part-of: musei-kasteev
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 5
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
   selector:
     matchLabels:
       app.kubernetes.io/name: musei-api
+  strategy:
+    canary:
+      maxSurge: 1
+      maxUnavailable: 0
+      steps:
+        - setWeight: 50
+        - pause:
+            duration: 20s
+        - setWeight: 100
   template:
     metadata:
       labels:
@@ -58,8 +62,8 @@ spec:
               cpu: 50m
               memory: 64Mi
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 75m
+              memory: 96Mi
           volumeMounts:
             - name: app-source
               mountPath: /app
@@ -70,12 +74,34 @@ spec:
           image: node:24-alpine
           imagePullPolicy: IfNotPresent
           workingDir: /app
-          command: ["node", "--no-warnings", "server.js"]
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              npm ci --omit=dev
+              node --no-warnings server.js
           env:
+            - name: NODE_ENV
+              value: production
             - name: PORT
               value: "4173"
-            - name: MUSEI_DB_FILE
-              value: /data/musei-kasteev.sqlite
+            - name: NPM_CONFIG_CACHE
+              value: /tmp/.npm
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: musei-postgres
+                  key: database-url
+            - name: MUSEI_DEMO_VISITOR_EMAIL
+              value: demo@musei.local
+            - name: MUSEI_DEMO_VISITOR_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: musei-demo-visitor
+                  key: password
+                  optional: true
+            - name: MUSEI_DEMO_ADMIN_EMAIL
+              value: admin@musei.local
             - name: MUSEI_DEMO_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -89,21 +115,21 @@ spec:
             httpGet:
               path: /api/healthz
               port: http
-            initialDelaySeconds: 8
+            initialDelaySeconds: 25
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /api/healthz
               port: http
-            initialDelaySeconds: 20
+            initialDelaySeconds: 60
             periodSeconds: 20
           resources:
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 250m
+              memory: 384Mi
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 375m
+              memory: 576Mi
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
@@ -112,8 +138,6 @@ spec:
           volumeMounts:
             - name: app-source
               mountPath: /app
-            - name: sqlite-data
-              mountPath: /data
             - name: tmp
               mountPath: /tmp
       volumes:
@@ -121,8 +145,5 @@ spec:
           emptyDir: {}
         - name: git-workspace
           emptyDir: {}
-        - name: sqlite-data
-          persistentVolumeClaim:
-            claimName: musei-sqlite-data
         - name: tmp
           emptyDir: {}

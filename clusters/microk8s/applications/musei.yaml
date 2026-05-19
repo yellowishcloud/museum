@@ -1,4 +1,4 @@
-apiVersion: argoproj.io/v1alpha1
+﻿apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: musei-kasteev
@@ -22,7 +22,14 @@ spec:
       name: musei-web
       namespace: museum-prod
       jsonPointers:
-        - /spec
+        - /spec/replicas
+        - /metadata/annotations/rollout.argoproj.io~1revision
+    - group: argoproj.io
+      kind: Rollout
+      name: musei-api
+      namespace: museum-prod
+      jsonPointers:
+        - /spec/replicas
         - /metadata/annotations/rollout.argoproj.io~1revision
   syncPolicy:
     automated:

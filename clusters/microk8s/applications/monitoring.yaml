@@ -1,4 +1,4 @@
-apiVersion: argoproj.io/v1alpha1
+﻿apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: monitoring
@@ -29,7 +29,6 @@ spec:
           persistence:
             enabled: true
             size: 1Gi
-            storageClassName: microk8s-hostpath
           sidecar:
             dashboards:
               enabled: false
@@ -42,13 +41,17 @@ spec:
               access: proxy
               isDefault: true
               editable: true
+            - name: Loki
+              type: loki
+              url: http://logging-loki.logging.svc.cluster.local:3100
+              access: proxy
+              editable: true
         prometheus:
           prometheusSpec:
             retention: 3d
             storageSpec:
               volumeClaimTemplate:
                 spec:
-                  storageClassName: microk8s-hostpath
                   accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
@@ -58,7 +61,6 @@ spec:
             storage:
               volumeClaimTemplate:
                 spec:
-                  storageClassName: microk8s-hostpath
                   accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:

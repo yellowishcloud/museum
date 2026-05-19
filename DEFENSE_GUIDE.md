@@ -1,53 +1,50 @@
-# Musei Kasteev Final Defense Guide
+﻿# Musei Kasteev Final Defense Guide
 
 ## 60-Second Opening
 
-Musei Kasteev is a digital museum prototype deployed through a GitOps Kubernetes workflow. The repository includes the application, Argo CD configuration, Argo Rollouts, monitoring, hardened namespace policies, storage, and a custom `MuseumBackupPolicy` extension.
+Musei Kasteev is a digital museum information system deployed on a Kubernetes cluster using a GitOps workflow. The live stack includes Argo CD, Argo Rollouts, ingress-nginx, PostgreSQL, Prometheus/Grafana metrics, Loki/Promtail logs, metrics-server autoscaling, secured namespaces, persistent storage, and a custom `MuseumBackupPolicy` CRD.
 
-The frontend is stateless, so I deploy it with a canary rollout: 25%, then 50%, then 100%. That lets me expose a new web version gradually and stop promotion if health checks fail.
+The business application has two main services: `musei-web` for the frontend and `musei-api` for the backend. Both use Argo Rollouts canary strategy, so updates move gradually instead of replacing the full system at once. The API can now be canary because I replaced SQLite with PostgreSQL, which removes the single-file database problem.
 
-The API is intentionally different. It uses one SQLite database file on one PVC, so I keep it as a simple Kubernetes `Deployment` with `Recreate`. A backend canary would mean multiple API versions touching the same SQLite file, which is not a clean architecture for this prototype. If I migrated persistence to PostgreSQL, then the API could become horizontally scalable and also use canary rollout safely.
+For security, the workloads run as non-root, drop Linux capabilities, use ResourceQuotas and LimitRanges, and are protected by NetworkPolicies. For reliability, the app has HPA autoscaling, PDBs, readiness/liveness probes, persistent database storage, monitoring, logs, and a backup-policy controller proof.
 
-For resources, I tightened the gap between requests and limits. The containers now use roughly 25-50% headroom instead of oversized 4-10x limits, which makes scheduling and quota planning more realistic.
+## Best Live Demo Order
 
-The project also demonstrates defense-in-depth: non-root containers, dropped Linux capabilities, restricted namespace policy, RBAC, NetworkPolicies, PodDisruptionBudgets, quotas, persistent storage, monitoring, and a small custom Kubernetes controller pattern.
+1. `kubectl get nodes -o wide` — show the cluster topology.
+2. `kubectl get applications -n argocd` — show GitOps apps all Synced/Healthy.
+3. `kubectl get rollout,deploy,svc,ingress,pvc,hpa -n museum-prod` — show business architecture.
+4. `kubectl get pods -n monitoring` and `kubectl get pods -n logging` — show metrics and logs.
+5. `kubectl get networkpolicy,resourcequota,limitrange,pdb -n museum-prod` — show security and governance.
+6. `kubectl get museumbackuppolicies -n museum-prod` and the generated ConfigMap — show the CRD/controller.
+7. Open the app at `http://127.0.0.1:8088` after port-forwarding `svc/musei-web`.
+8. Show a canary update by patching a rollout annotation and watching ReplicaSets change.
 
-## Best Demo Order
+## Exact Answers
 
-1. Show the repository structure and GitOps entry point in `clusters/microk8s/applications/musei.yaml`.
-2. Show `apps/musei/web-rollout.yaml` and explain the 25% -> 50% -> 100% frontend canary.
-3. Show `apps/musei/api-deployment.yaml` and explain why the API is intentionally not canary in the SQLite prototype.
-4. Show `apps/musei/security.yaml`, `network-policies.yaml`, and `rbac.yaml` as the security layer.
-5. Show `storage.yaml` and `backup-policy.yaml` as the persistence layer.
-6. Show `hpa.yaml`, `pdb.yaml`, and monitoring manifests as the reliability layer.
-7. End by opening the running application and the dashboards if available.
+### Do we meet Perfection?
 
-## Exact Answers To Likely Questions
+Yes. The live cluster has defined release strategies, working autoscaling, a CRD/controller, monitoring, logging, secure workload controls, persistent PostgreSQL storage, and a complete business application.
 
-### Why is the web canary but the API a simple Deployment?
+### Why PostgreSQL instead of SQLite?
 
-Because the web layer is stateless and safe to split across versions. The API stores data in a single SQLite file on a PVC, so running two backend versions side by side is not a good canary design for this prototype. I used `Recreate` intentionally to preserve a single-writer model. With PostgreSQL or another external database, I would make the API horizontally scalable and then use a canary rollout there too.
+SQLite is good for a local prototype, but it is a single-file database and does not fit multiple API replicas or canary updates cleanly. PostgreSQL makes the API stateless enough for scaling and progressive delivery.
 
-### Why not just make the API canary for symmetry?
+### What is the release strategy?
 
-Symmetry is not the goal; safe architecture is. A rollout strategy should match the workload. Canary fits the frontend today. The backend first needs database architecture that supports multiple replicas cleanly.
+The frontend and API use Argo Rollouts canary strategy. The frontend moves 25% -> 50% -> 100%; the API moves 50% -> 100%. PostgreSQL uses a safer single-instance persistent update model.
 
-### Why are requests and limits close now?
+### What proves autoscaling works?
 
-Requests reserve the amount the scheduler should plan for; limits cap burst usage. If limits are 10 times larger than requests, capacity planning becomes less honest and noisy-neighbor risk increases. I kept the gap around 25-50% so there is still burst room without pretending the workload needs huge emergency headroom.
+`metrics-server` is installed, `kubectl top` returns metrics, and both `musei-web` and `musei-api` have HPAs with live CPU targets.
 
-### What happens if a frontend canary is unhealthy?
+### What proves monitoring and logs?
 
-Readiness checks fail, the rollout pauses, and promotion stops before all traffic moves to the new version. The previous stable ReplicaSet stays available.
+Prometheus, Grafana, Alertmanager, Loki, and Promtail are running. Grafana has Prometheus and Loki data sources, so the defense can show both metrics and log infrastructure.
 
-### What happens during an API update?
+### What proves security?
 
-Because the API is one-replica and SQLite-backed, the `Recreate` strategy stops the old pod before starting the new one. That trades a short update interruption for data-model simplicity in the prototype. In production, I would externalize the database to remove that limitation.
-
-### What are the strongest DevOps features in the project?
-
-GitOps deployment, progressive delivery for the stateless frontend, resource governance, namespace hardening, least-privilege networking and RBAC, persistent storage, monitoring, autoscaling for the web tier, disruption budgets, and a custom CRD/controller pattern.
+The namespace enforces restricted Pod Security. Pods run non-root, service account tokens are disabled where possible, capabilities are dropped, NetworkPolicies default-deny traffic, RBAC is least-privilege, and resources are controlled with quota and limits.
 
 ## One-Line Closing
 
-This project is not only deployed; it is defended by clear trade-offs. The final architecture shows where progressive delivery helps today and where a future production version should evolve next.
+This is not only an app on Kubernetes; it is a defended platform design with GitOps, progressive delivery, observability, storage, security, autoscaling, and a custom extension.

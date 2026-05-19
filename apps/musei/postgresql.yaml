@@ -25,7 +25,7 @@ metadata:
     app.kubernetes.io/component: database
     app.kubernetes.io/part-of: musei-kasteev
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 3
   strategy:
     type: Recreate

@@ -50,7 +50,7 @@ spec:
           args:
             - |
               set -eu
-              git clone --depth=1 --branch=main https://github.com/yellowishcloud/museum.git /workspace/src
+              git clone --depth=1 --branch=main git://museum-git.gitops.svc.cluster.local/museum.git /workspace/src
               cp -R /workspace/src/. /app
           securityContext:
             allowPrivilegeEscalation: false
@@ -147,3 +147,4 @@ spec:
           emptyDir: {}
         - name: tmp
           emptyDir: {}
+

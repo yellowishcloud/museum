@@ -10,7 +10,7 @@ metadata:
 spec:
   project: final-project
   source:
-    repoURL: https://github.com/yellowishcloud/museum.git
+    repoURL: git://museum-git.gitops.svc.cluster.local/museum.git
     targetRevision: main
     path: apps/musei
   destination:
@@ -38,3 +38,4 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+

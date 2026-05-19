@@ -1,4 +1,4 @@
-apiVersion: argoproj.io/v1alpha1
+﻿apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: museum-custom-extension
@@ -10,7 +10,7 @@ metadata:
 spec:
   project: final-project
   source:
-    repoURL: https://github.com/yellowishcloud/museum.git
+    repoURL: git://museum-git.gitops.svc.cluster.local/museum.git
     targetRevision: main
     path: platform/custom-extension
   destination:
@@ -23,3 +23,4 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+

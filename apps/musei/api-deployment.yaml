@@ -111,6 +111,7 @@ spec:
           ports:
             - name: http
               containerPort: 4173
+              protocol: TCP
           readinessProbe:
             httpGet:
               path: /api/healthz

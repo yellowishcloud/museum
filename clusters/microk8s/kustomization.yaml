@@ -3,8 +3,10 @@ kind: Kustomization
 resources:
   - projects/final-project.yaml
   - applications/ingress-nginx.yaml
+  - applications/metrics-server.yaml
   - applications/argo-rollouts.yaml
   - applications/monitoring.yaml
   - applications/logging.yaml
   - applications/custom-extension.yaml
   - applications/musei.yaml
+

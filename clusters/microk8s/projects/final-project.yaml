@@ -11,6 +11,7 @@ spec:
     - https://argoproj.github.io/argo-helm
     - https://prometheus-community.github.io/helm-charts
     - https://kubernetes.github.io/ingress-nginx
+    - https://kubernetes-sigs.github.io/metrics-server/
     - https://grafana.github.io/helm-charts
   destinations:
     - namespace: museum-prod
@@ -38,4 +39,5 @@ spec:
       description: Read-only project access for project review
       policies:
         - p, proj:final-project:readonly-review, applications, get, final-project/*, allow
+
 

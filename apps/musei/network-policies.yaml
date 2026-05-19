@@ -70,7 +70,7 @@ spec:
               kubernetes.io/metadata.name: gitops
       ports:
         - protocol: TCP
-          port: 8000
+          port: 9418
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -193,4 +193,5 @@ spec:
           port: 4173
         - protocol: TCP
           port: 5432
+
 

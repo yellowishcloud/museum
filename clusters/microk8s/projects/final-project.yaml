@@ -1,4 +1,4 @@
-apiVersion: argoproj.io/v1alpha1
+﻿apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
   name: final-project
@@ -6,7 +6,7 @@ metadata:
 spec:
   description: DevOps II final project GitOps project
   sourceRepos:
-    - http://museum-git.gitops.svc.cluster.local:8000/museum.git
+    - git://museum-git.gitops.svc.cluster.local/museum.git
     - https://github.com/yellowishcloud/museum.git
     - https://argoproj.github.io/argo-helm
     - https://prometheus-community.github.io/helm-charts
@@ -38,3 +38,4 @@ spec:
       description: Read-only project access for project review
       policies:
         - p, proj:final-project:readonly-review, applications, get, final-project/*, allow
+

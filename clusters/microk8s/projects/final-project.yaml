@@ -6,15 +6,22 @@ metadata:
 spec:
   description: DevOps II final project GitOps project
   sourceRepos:
+    - http://museum-git.gitops.svc.cluster.local:8000/museum.git
     - https://github.com/yellowishcloud/museum.git
     - https://argoproj.github.io/argo-helm
     - https://prometheus-community.github.io/helm-charts
+    - https://kubernetes.github.io/ingress-nginx
+    - https://grafana.github.io/helm-charts
   destinations:
     - namespace: museum-prod
       server: https://kubernetes.default.svc
     - namespace: argo-rollouts
       server: https://kubernetes.default.svc
     - namespace: monitoring
+      server: https://kubernetes.default.svc
+    - namespace: logging
+      server: https://kubernetes.default.svc
+    - namespace: ingress-nginx
       server: https://kubernetes.default.svc
     - namespace: museum-system
       server: https://kubernetes.default.svc
